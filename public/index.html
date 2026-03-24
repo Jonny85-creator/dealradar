@@ -1,13 +1,523 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>DealRadar — Redirecting</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DealRadar — Live Clearance & Penny Deal Finder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@400;500;700;800;900&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --red: #E8321A; --red-light: #FF4D33; --red-dim: rgba(232,50,26,0.1);
+  --gold: #D4920A; --gold-bg: #FFFBF0; --gold-border: rgba(212,146,10,0.25);
+  --green: #16A34A; --bg: #F5F4F1; --white: #FFFFFF;
+  --ink: #1A1714; --ink2: #3D3A36; --ink3: #7A7672;
+  --border: #E2DFD9; --border2: #CCC9C2;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Instrument Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+nav { position: sticky; top: 0; z-index: 100; background: var(--white); border-bottom: 1.5px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 52px; }
+.logo { display: flex; align-items: center; gap: 9px; font-family: 'Cabinet Grotesk', sans-serif; font-weight: 900; font-size: 20px; color: var(--ink); letter-spacing: -0.5px; text-decoration: none; }
+.logo-mark { width: 30px; height: 30px; border-radius: 8px; background: var(--red); display: flex; align-items: center; justify-content: center; }
+.logo-mark svg { width: 16px; height: 16px; fill: white; }
+.nav-links { display: flex; align-items: center; gap: 6px; }
+.nav-btn { padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1.5px solid transparent; transition: all .15s; font-family: 'Instrument Sans', sans-serif; }
+.nav-btn-ghost { color: var(--ink2); border-color: var(--border); background: transparent; }
+.nav-btn-fill { background: var(--ink); color: white; border-color: var(--ink); }
+.hero { background: var(--white); border-bottom: 1.5px solid var(--border); padding: 44px 24px 36px; text-align: center; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 700px; height: 300px; background: radial-gradient(ellipse, rgba(232,50,26,0.06) 0%, transparent 70%); pointer-events: none; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 7px; background: var(--red-dim); border: 1px solid rgba(232,50,26,0.2); border-radius: 100px; padding: 4px 12px; font-size: 12px; font-weight: 500; color: var(--red); margin-bottom: 20px; animation: fadeUp .4s ease forwards; opacity: 0; transform: translateY(6px); }
+.pulse-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--red); animation: blink 1.8s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+h1 { font-family: 'Cabinet Grotesk', sans-serif; font-size: clamp(34px, 6vw, 68px); font-weight: 900; line-height: 1.0; letter-spacing: -2px; color: var(--ink); margin-bottom: 14px; animation: fadeUp .4s ease .08s forwards; opacity: 0; transform: translateY(6px); }
+h1 span { color: var(--red); font-style: italic; }
+.hero p { font-size: 15px; color: var(--ink3); max-width: 460px; margin: 0 auto 28px; line-height: 1.6; animation: fadeUp .4s ease .16s forwards; opacity: 0; transform: translateY(6px); }
+.search-wrap { max-width: 480px; margin: 0 auto; animation: fadeUp .4s ease .22s forwards; opacity: 0; transform: translateY(6px); }
+.search-box { display: flex; background: var(--white); border: 2px solid var(--ink); border-radius: 12px; overflow: hidden; box-shadow: 4px 4px 0px var(--ink); transition: box-shadow .15s; }
+.search-box:focus-within { box-shadow: 6px 6px 0px var(--red); border-color: var(--red); }
+.search-icon { display: flex; align-items: center; padding: 0 14px; color: var(--ink3); }
+.search-icon svg { width: 18px; height: 18px; }
+#zipInput { flex: 1; padding: 14px 0; border: none; outline: none; font-family: 'Cabinet Grotesk', sans-serif; font-size: 22px; font-weight: 700; letter-spacing: 3px; color: var(--ink); background: transparent; }
+#zipInput::placeholder { color: var(--border2); letter-spacing: 1px; font-size: 16px; font-weight: 500; }
+.search-btn { margin: 6px; padding: 10px 20px; background: var(--red); color: white; font-family: 'Cabinet Grotesk', sans-serif; font-weight: 800; font-size: 14px; border: none; border-radius: 8px; cursor: pointer; transition: background .15s; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
+.search-btn:hover { background: var(--red-light); }
+.search-meta { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 12px; font-size: 12px; color: var(--ink3); }
+.search-meta-item { display: flex; align-items: center; gap: 4px; }
+.check { color: var(--green); }
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+.filter-bar { background: var(--white); border-bottom: 1.5px solid var(--border); display: flex; align-items: center; gap: 8px; padding: 10px 24px; overflow-x: auto; scrollbar-width: none; }
+.filter-bar::-webkit-scrollbar { display: none; }
+.filter-label { font-size: 11px; font-weight: 600; color: var(--ink3); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; margin-right: 4px; }
+.filter-chip { display: flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 6px; font-size: 12.5px; font-weight: 500; cursor: pointer; white-space: nowrap; border: 1.5px solid var(--border); color: var(--ink2); background: var(--white); transition: all .12s; font-family: 'Instrument Sans', sans-serif; }
+.filter-chip.on { background: var(--ink); color: white; border-color: var(--ink); }
+.filter-chip.on.hd { background: #E85D00; border-color: #E85D00; }
+.filter-chip.on.penny { background: var(--gold); border-color: var(--gold); }
+.store-pip { width: 7px; height: 7px; border-radius: 50%; }
+.pip-hd { background: #E85D00; }
+.main { max-width: 1100px; margin: 0 auto; padding: 24px 24px 60px; }
+.results-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+.results-title { font-family: 'Cabinet Grotesk', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: -.3px; }
+.results-title .zip-tag { display: inline-block; background: var(--red); color: white; font-size: 14px; padding: 2px 8px; border-radius: 5px; vertical-align: middle; margin-left: 6px; font-weight: 700; }
+.sort-select { font-size: 12.5px; font-family: 'Instrument Sans', sans-serif; padding: 5px 10px; border: 1.5px solid var(--border); border-radius: 6px; background: white; color: var(--ink); cursor: pointer; outline: none; }
+.penny-strip { background: var(--gold-bg); border: 1.5px solid var(--gold-border); border-radius: 10px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+.penny-strip .coin { font-size: 22px; flex-shrink: 0; }
+.penny-strip strong { font-family: 'Cabinet Grotesk', sans-serif; font-weight: 800; font-size: 14px; color: var(--gold); }
+.penny-strip p { font-size: 12.5px; color: var(--ink3); margin-top: 1px; }
+.penny-strip .count-badge { margin-left: auto; flex-shrink: 0; background: var(--gold); color: white; font-family: 'Cabinet Grotesk', sans-serif; font-weight: 800; font-size: 22px; line-height: 1; padding: 6px 12px; border-radius: 8px; }
+.deal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.deal-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform .15s, box-shadow .15s, border-color .15s; display: flex; flex-direction: column; }
+.deal-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.09); border-color: var(--border2); }
+.deal-card.penny-card { border-color: var(--gold-border); background: linear-gradient(160deg, var(--gold-bg) 0%, white 60%); }
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; padding: 14px 14px 0; }
+.discount-pill { font-family: 'Cabinet Grotesk', sans-serif; font-weight: 900; font-size: 13px; padding: 3px 9px; border-radius: 5px; }
+.pill-red { background: var(--red); color: white; }
+.pill-gold { background: var(--gold); color: white; }
+.store-chip { display: flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; border: 1.5px solid; }
+.chip-hd { color: #C94E00; border-color: rgba(201,78,0,.2); background: rgba(201,78,0,.06); }
+.chip-pip { width: 6px; height: 6px; border-radius: 50%; background: #E85D00; }
+.card-body { padding: 10px 14px 0; flex: 1; }
+.item-name { font-family: 'Cabinet Grotesk', sans-serif; font-size: 14px; font-weight: 800; line-height: 1.25; color: var(--ink); margin-bottom: 3px; }
+.item-brand { font-size: 10.5px; color: var(--ink3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+.price-block { display: flex; align-items: baseline; gap: 8px; margin-bottom: 2px; }
+.price-now { font-family: 'Cabinet Grotesk', sans-serif; font-weight: 900; font-size: 26px; letter-spacing: -1px; }
+.price-now.red { color: var(--red); }
+.price-now.gold { color: var(--gold); }
+.price-was { font-size: 12.5px; color: var(--ink3); text-decoration: line-through; }
+.price-save { font-size: 11.5px; color: var(--green); font-weight: 600; margin-bottom: 6px; }
+.sku-line { font-size: 10px; color: var(--ink3); margin-bottom: 4px; font-family: monospace; }
+.stock-bar { display: flex; align-items: center; gap: 6px; margin: 6px 0 0; }
+.stock-indicator { display: flex; gap: 3px; }
+.stock-pip { width: 8px; height: 8px; border-radius: 2px; background: var(--border); }
+.stock-pip.filled { background: var(--green); }
+.stock-pip.filled.low { background: #EF4444; }
+.stock-label { font-size: 11px; color: var(--ink3); }
+.store-location { margin: 10px 14px 14px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+.store-logo-sq { width: 32px; height: 32px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Cabinet Grotesk', sans-serif; font-weight: 900; font-size: 10px; background: #E85D00; color: white; }
+.store-details { flex: 1; min-width: 0; }
+.store-name-line { font-size: 12px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.store-addr-line { font-size: 11px; color: var(--ink3); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.store-dist-line { font-size: 10.5px; color: var(--ink3); margin-top: 1px; }
+.map-btn { flex-shrink: 0; padding: 5px 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 11px; font-weight: 600; color: var(--red); background: white; cursor: pointer; white-space: nowrap; transition: all .12s; }
+.map-btn:hover { border-color: var(--red); background: var(--red-dim); }
+.loading-wrap { display: none; padding: 60px 24px; text-align: center; }
+.loading-wrap.active { display: block; }
+.radar-anim { width: 80px; height: 80px; position: relative; margin: 0 auto 20px; }
+.radar-ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--red); opacity: 0; animation: radarPulse 2s ease infinite; }
+.radar-ring:nth-child(2) { animation-delay: .66s; }
+.radar-ring:nth-child(3) { animation-delay: 1.32s; }
+.radar-center { position: absolute; inset: 50%; transform: translate(-50%,-50%); width: 16px; height: 16px; border-radius: 50%; background: var(--red); }
+@keyframes radarPulse { 0%{transform:scale(.2);opacity:.8} 100%{transform:scale(1);opacity:0} }
+.loading-title { font-family: 'Cabinet Grotesk', sans-serif; font-size: 20px; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
+.loading-sub { font-size: 13.5px; color: var(--ink3); }
+.loading-steps { max-width: 340px; margin: 20px auto 0; text-align: left; }
+.loading-step { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink3); padding: 7px 0; border-bottom: 1px solid var(--border); opacity: 0; animation: fadeUp .3s ease forwards; }
+.loading-step:last-child { border-bottom: none; }
+.step-icon { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.step-icon.done { background: var(--green); border-color: var(--green); color: white; }
+.error-box { display: none; background: #FFF5F5; border: 1.5px solid #FECACA; border-radius: 10px; padding: 16px 20px; margin-bottom: 20px; font-size: 13.5px; color: #B91C1C; }
+.error-box.show { display: block; }
+.idle-wrap { text-align: center; padding: 60px 24px; }
+.idle-wrap h3 { font-family: 'Cabinet Grotesk', sans-serif; font-size: 22px; font-weight: 800; color: var(--ink); margin-bottom: 8px; }
+.idle-wrap p { font-size: 14px; color: var(--ink3); }
+.modal-backdrop { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(20,18,16,0.55); backdrop-filter: blur(4px); align-items: flex-end; justify-content: center; }
+.modal-backdrop.open { display: flex; animation: backdropIn .2s ease; }
+@keyframes backdropIn { from{opacity:0} to{opacity:1} }
+.modal { background: var(--white); border-radius: 20px 20px 0 0; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; animation: slideUp .25s cubic-bezier(.32,.72,0,1); border: 1.5px solid var(--border); border-bottom: none; }
+@media(min-width:600px){ .modal-backdrop { align-items: center; padding: 20px; } .modal { border-radius: 16px; border: 1.5px solid var(--border); max-height: 85vh; } }
+@keyframes slideUp { from{transform:translateY(40px);opacity:0} to{transform:translateY(0);opacity:1} }
+.modal-handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 12px auto 0; }
+@media(min-width:600px){ .modal-handle { display: none; } }
+.modal-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 16px 20px 12px; border-bottom: 1.5px solid var(--border); gap: 12px; }
+.modal-title { font-family: 'Cabinet Grotesk', sans-serif; font-size: 17px; font-weight: 900; line-height: 1.2; letter-spacing: -.3px; color: var(--ink); }
+.modal-brand { font-size: 11.5px; color: var(--ink3); text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
+.modal-close { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; background: var(--bg); border: 1.5px solid var(--border); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--ink2); transition: all .12s; margin-top: 2px; }
+.modal-body { padding: 18px 20px; }
+.modal-price-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.modal-price-now { font-family: 'Cabinet Grotesk', sans-serif; font-size: 40px; font-weight: 900; letter-spacing: -2px; line-height: 1; }
+.modal-price-now.red { color: var(--red); }
+.modal-price-now.gold { color: var(--gold); }
+.modal-price-was { font-size: 15px; color: var(--ink3); text-decoration: line-through; }
+.modal-save { font-size: 13px; color: var(--green); font-weight: 600; margin-bottom: 14px; }
+.modal-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.modal-badge { padding: 4px 10px; border-radius: 6px; font-family: 'Cabinet Grotesk', sans-serif; font-size: 12px; font-weight: 800; }
+.modal-divider { border: none; border-top: 1.5px solid var(--border); margin: 14px 0; }
+.modal-section-label { font-size: 10.5px; font-weight: 600; color: var(--ink3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.modal-store-block { background: var(--bg); border: 1.5px solid var(--border); border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.modal-store-sq { width: 40px; height: 40px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Cabinet Grotesk', sans-serif; font-weight: 900; font-size: 12px; color: white; }
+.modal-store-info { flex: 1; min-width: 0; }
+.modal-store-name { font-size: 14px; font-weight: 600; color: var(--ink); }
+.modal-store-addr { font-size: 12px; color: var(--ink3); margin-top: 2px; }
+.modal-store-dist { font-size: 11.5px; color: var(--ink3); margin-top: 2px; }
+.modal-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.modal-detail-item { background: var(--bg); border-radius: 8px; padding: 10px 12px; border: 1.5px solid var(--border); }
+.modal-detail-key { font-size: 10.5px; color: var(--ink3); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 3px; }
+.modal-detail-val { font-size: 13px; font-weight: 600; color: var(--ink); font-family: 'Cabinet Grotesk', sans-serif; }
+.modal-actions { display: flex; gap: 8px; }
+.modal-action-btn { flex: 1; padding: 12px 16px; border-radius: 10px; font-family: 'Cabinet Grotesk', sans-serif; font-weight: 800; font-size: 14px; cursor: pointer; border: 1.5px solid; transition: all .15s; text-align: center; }
+.btn-primary { background: var(--ink); color: white; border-color: var(--ink); }
+.btn-secondary { background: white; color: var(--ink); border-color: var(--border2); }
+.penny-note { background: var(--gold-bg); border: 1.5px solid var(--gold-border); border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: var(--gold); margin-bottom: 14px; display: flex; gap: 8px; align-items: flex-start; }
+.hd-image { width: 100%; height: 160px; object-fit: contain; background: #f9f9f7; padding: 10px; display: block; }
+footer { text-align: center; padding: 32px 20px; border-top: 1.5px solid var(--border); font-size: 12px; color: var(--ink3); background: var(--white); }
+footer a { color: var(--ink2); }
+</style>
 </head>
 <body>
+  <div class="modal-backdrop" id="modalBackdrop" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="modalTitle"></div>
+        <div class="modal-brand" id="modalBrand"></div>
+      </div>
+      <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<nav>
+  <a class="logo" href="#">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6a6 6 0 1 0 6 6"/></svg>
+    </div>
+    DealRadar
+  </a>
+  <div class="nav-links">
+    <button class="nav-btn nav-btn-ghost">How it works</button>
+    <button class="nav-btn nav-btn-fill">Sign in</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow"><span class="pulse-dot"></span> Live Home Depot inventory</div>
+  <h1>Real clearance.<br><span>Real prices.</span></h1>
+  <p>Enter your ZIP and we scan live Home Depot inventory for items 70%+ off and penny deals — real SKUs, real stores, real stock.</p>
+  <div class="search-wrap">
+    <div class="search-box">
+      <div class="search-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+          <circle cx="12" cy="9" r="2.5"/>
+        </svg>
+      </div>
+      <input id="zipInput" type="text" inputmode="numeric" maxlength="5" placeholder="Enter ZIP code" />
+      <button class="search-btn" onclick="runScan()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/>
+        </svg>
+        Scan Now
+      </button>
+    </div>
+    <div class="search-meta">
+      <div class="search-meta-item"><span class="check">✓</span> Live Home Depot data</div>
+      <div class="search-meta-item"><span class="check">✓</span> Real SKUs & prices</div>
+      <div class="search-meta-item"><span class="check">✓</span> Real store inventory</div>
+    </div>
+  </div>
+</div>
+
+<div class="filter-bar">
+  <span class="filter-label">Filter:</span>
+  <button class="filter-chip on hd" onclick="toggleFilter(this,'hd')"><span class="store-pip pip-hd"></span>Home Depot</button>
+  <button class="filter-chip" onclick="toggleFilter(this,'penny')">🪙 Penny Only</button>
+  <button class="filter-chip" onclick="toggleFilter(this,'70')">70%+ Off</button>
+  <button class="filter-chip" onclick="toggleFilter(this,'90')">90%+ Off</button>
+</div>
+
+<div class="main">
+  <div class="loading-wrap" id="loadingWrap">
+    <div class="radar-anim">
+      <div class="radar-ring"></div><div class="radar-ring"></div><div class="radar-ring"></div>
+      <div class="radar-center"></div>
+    </div>
+    <div class="loading-title">Scanning Home Depot…</div>
+    <div class="loading-sub">Checking live inventory near <strong id="loadingZip"></strong></div>
+    <div class="loading-steps" id="loadingSteps"></div>
+  </div>
+
+  <div class="idle-wrap" id="idleWrap">
+    <div style="font-size:52px;margin-bottom:16px;">📡</div>
+    <h3>Enter your ZIP to start scanning</h3>
+    <p>We'll find real clearance items and penny deals<br>at Home Depot stores within 25 miles of you.</p>
+  </div>
+
+  <div id="resultsWrap" style="display:none;">
+    <div class="error-box" id="errorBox"></div>
+    <div class="results-bar">
+      <div class="results-title" id="resultsTitle">Deals found</div>
+      <div class="sort-row">
+        <span style="font-size:12px;color:var(--ink3);">Sort by:</span>
+        <select class="sort-select" onchange="sortDeals(this.value)">
+          <option value="discount">Best discount</option>
+          <option value="price">Lowest price</option>
+          <option value="penny">Penny deals first</option>
+        </select>
+      </div>
+    </div>
+    <div class="penny-strip" id="pennyStrip" style="display:none;">
+      <div class="coin">🪙</div>
+      <div>
+        <strong>Penny deals detected!</strong>
+        <p id="pennyStripText"></p>
+      </div>
+      <div class="count-badge" id="pennyCount">—</div>
+    </div>
+    <div class="deal-grid" id="dealGrid"></div>
+  </div>
+</div>
+
+<footer>
+  <p>© 2026 DealRadar &nbsp;·&nbsp; <a href="#">Privacy</a> &nbsp;·&nbsp; <a href="#">Terms</a><br>
+  Powered by live Home Depot inventory data. Always verify prices in store.</p>
+</footer>
 <script>
-  // This file just confirms the server is working
-  document.body.innerHTML = '<h2 style="font-family:sans-serif;padding:40px">✅ DealRadar server is running!</h2>';
+const SERVER = 'https://dealradar-78rn.onrender.com';
+let allDeals = [];
+
+const zipInput = document.getElementById('zipInput');
+zipInput.addEventListener('input', function() { this.value = this.value.replace(/\D/g,'').slice(0,5); });
+zipInput.addEventListener('keydown', e => { if (e.key === 'Enter') runScan(); });
+
+async function runScan() {
+  const zip = zipInput.value.trim();
+  if (zip.length !== 5) { zipInput.style.outline = '2px solid var(--red)'; zipInput.focus(); return; }
+  zipInput.style.outline = '';
+
+  document.getElementById('idleWrap').style.display = 'none';
+  document.getElementById('resultsWrap').style.display = 'none';
+  document.getElementById('loadingWrap').classList.add('active');
+  document.getElementById('loadingZip').textContent = zip;
+  document.getElementById('loadingSteps').innerHTML = '';
+  document.getElementById('errorBox').classList.remove('show');
+
+  addStep('Connecting to DealRadar server…');
+
+  try {
+    addStep(`Starting Home Depot scan for ZIP ${zip}…`);
+    const startRes = await fetch(`${SERVER}/api/scan`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ zip })
+    });
+    if (!startRes.ok) {
+      const err = await startRes.json();
+      throw new Error(err.error || `Server error ${startRes.status}`);
+    }
+    const { runId, datasetId } = await startRes.json();
+    addStep('Scan started — waiting for Home Depot data…');
+
+    let status = 'RUNNING';
+    let attempts = 0;
+    while (status === 'RUNNING' || status === 'READY') {
+      await sleep(4000);
+      attempts++;
+      if (attempts > 30) throw new Error('Scan timed out. Please try again.');
+      const statusRes = await fetch(`${SERVER}/api/status/${runId}`);
+      const statusData = await statusRes.json();
+      status = statusData.status;
+      if (attempts === 3) addStep('Still scanning Home Depot inventory…');
+      if (attempts === 7) addStep('Almost done — fetching clearance prices…');
+    }
+    if (status !== 'SUCCEEDED') throw new Error(`Scan ended with status: ${status}. Please try again.`);
+
+    addStep('Retrieving deals from dataset…');
+    const resultsRes = await fetch(`${SERVER}/api/results/${datasetId}`);
+    const rawItems = await resultsRes.json();
+    addStep('Filtering for best markdowns and penny deals…');
+    processAndShowResults(zip, rawItems || []);
+
+  } catch(err) {
+    document.getElementById('loadingWrap').classList.remove('active');
+    document.getElementById('resultsWrap').style.display = 'block';
+    document.getElementById('errorBox').classList.add('show');
+    document.getElementById('errorBox').innerHTML = `<strong>Scan error:</strong> ${err.message}`;
+  }
+}
+
+function processAndShowResults(zip, rawItems) {
+  document.getElementById('loadingWrap').classList.remove('active');
+  let deals = rawItems.map(normalizeItem).filter(Boolean);
+  deals = deals.filter(d => d.wasPrice && d.price < d.wasPrice);
+  deals.sort((a,b) => ((b.wasPrice-b.price)/b.wasPrice) - ((a.wasPrice-a.price)/a.wasPrice));
+  allDeals = deals;
+
+  const pennies = deals.filter(d => d.price <= 0.01);
+  if (pennies.length > 0) {
+    document.getElementById('pennyStrip').style.display = 'flex';
+    document.getElementById('pennyCount').textContent = pennies.length;
+    document.getElementById('pennyStripText').textContent = `${pennies.length} item${pennies.length>1?'s':''} scanning at $0.01 near ${zip}`;
+  } else {
+    document.getElementById('pennyStrip').style.display = 'none';
+  }
+
+  document.getElementById('resultsTitle').innerHTML = `${deals.length} deals found <span class="zip-tag">${zip}</span>`;
+
+  if (deals.length === 0) {
+    document.getElementById('errorBox').classList.add('show');
+    document.getElementById('errorBox').innerHTML = `<strong>No discounted items found</strong> for ZIP ${zip}. Try a nearby ZIP or scan again later — clearance inventory changes throughout the day.`;
+  }
+
+  renderDeals(deals);
+  document.getElementById('resultsWrap').style.display = 'block';
+}
+
+function normalizeItem(raw) {
+  try {
+    const name = raw.name || raw.title || raw.productName || '';
+    const brand = raw.brand || raw.manufacturer || 'Home Depot';
+    const sku = raw.sku || raw.itemId || raw.productId || raw.model || '—';
+    const price = parseFloat(raw.price || raw.currentPrice || raw.salePrice || 0);
+    const wasPrice = parseFloat(raw.wasPrice || raw.originalPrice || raw.regularPrice || raw.listPrice || 0);
+    const rating = raw.rating || raw.stars || null;
+    const image = raw.image || raw.imageUrl || raw.thumbnail || null;
+    const url = raw.url || raw.productUrl || null;
+    const storeName = raw.storeName || raw.nearestStoreName || 'Home Depot';
+    const storeAddress = raw.storeAddress || raw.nearestStoreAddress || '';
+    const distance = raw.distance || raw.storeDistance || null;
+    const stock = raw.availableInStore || raw.quantity || raw.stockLevel || null;
+    if (!name || price <= 0) return null;
+    return { name, brand, sku, price, wasPrice, rating, image, url, storeName, storeAddress, distance, stock };
+  } catch(e) { return null; }
+}
+
+function renderDeals(deals) {
+  document.getElementById('dealGrid').innerHTML = deals.map((d,i) => renderCard(d,i)).join('');
+}
+
+function renderCard(deal, idx) {
+  const { name, brand, price, wasPrice, sku, rating, image, storeName, storeAddress, distance, stock } = deal;
+  const isPenny = price <= 0.01;
+  const hasOriginal = wasPrice && wasPrice > price;
+  const pct = hasOriginal ? Math.round((1 - price/wasPrice)*100) : null;
+  const saved = hasOriginal ? (wasPrice-price).toFixed(2) : null;
+  const stockNum = typeof stock === 'number' ? stock : null;
+  const distText = distance ? `${parseFloat(distance).toFixed(1)} mi away` : 'Nearby';
+  const imgHtml = image ? `<img class="hd-image" src="${image}" alt="${name}" onerror="this.style.display='none'" />` : '';
+  const ratingHtml = rating ? `<div style="font-size:11.5px;color:var(--ink3);margin-bottom:4px;"><span style="color:#F59E0B;">${'★'.repeat(Math.round(parseFloat(rating)))}</span> ${parseFloat(rating).toFixed(1)}</div>` : '';
+  return `
+    <div class="deal-card${isPenny?' penny-card':''}" onclick="openModal(${idx})">
+      ${imgHtml}
+      <div class="card-top">
+        <span class="discount-pill ${isPenny?'pill-gold':'pill-red'}">${isPenny?'🪙 PENNY':pct?pct+'% OFF':'CLEARANCE'}</span>
+        <span class="store-chip chip-hd"><span class="chip-pip"></span>Home Depot</span>
+      </div>
+      <div class="card-body">
+        <div class="item-name">${name}</div>
+        <div class="item-brand">${brand}</div>
+        <div class="price-block">
+          <span class="price-now ${isPenny?'gold':'red'}">$${parseFloat(price).toFixed(2)}</span>
+          ${hasOriginal?`<span class="price-was">was $${parseFloat(wasPrice).toFixed(2)}</span>`:''}
+        </div>
+        ${saved?`<div class="price-save">You save $${saved}</div>`:''}
+        ${ratingHtml}
+        <div class="sku-line">SKU: ${sku}</div>
+        ${stockNum?`<div class="stock-bar">${stockPips(stockNum)}<span class="stock-label">${stockNum===1?'Last one!':stockNum+' in stock'}</span></div>`:''}
+      </div>
+      <div class="store-location">
+        <div class="store-logo-sq">HD</div>
+        <div class="store-details">
+          <div class="store-name-line">${storeName}</div>
+          <div class="store-addr-line">${storeAddress||'See store for details'}</div>
+          <div class="store-dist-line">${distText}</div>
+        </div>
+        <button class="map-btn" onclick="event.stopPropagation();openMap('${storeAddress}')">Map →</button>
+      </div>
+    </div>`;
+}
+
+function stockPips(count, max=5) {
+  const filled = Math.min(count,max); const isLow = count<=2;
+  let h = '<div class="stock-indicator">';
+  for(let i=0;i<max;i++) h+=`<div class="stock-pip${i<filled?' filled'+(isLow?' low':''):''}"></div>`;
+  return h+'</div>';
+}
+
+function openModal(idx) {
+  const d = allDeals[idx];
+  const { name, brand, price, wasPrice, sku, rating, image, url, storeName, storeAddress, distance, stock } = d;
+  const isPenny = price <= 0.01;
+  const hasOriginal = wasPrice && wasPrice > price;
+  const pct = hasOriginal ? Math.round((1-price/wasPrice)*100) : null;
+  const saved = hasOriginal ? (wasPrice-price).toFixed(2) : null;
+  const distText = distance ? `${parseFloat(distance).toFixed(1)} miles from your ZIP` : 'Nearby';
+  const stockNum = typeof stock === 'number' ? stock : null;
+  document.getElementById('modalTitle').textContent = name;
+  document.getElementById('modalBrand').textContent = brand;
+  const imgHtml = image ? `<img src="${image}" alt="${name}" style="width:100%;height:180px;object-fit:contain;background:#f9f9f7;border-radius:8px;margin-bottom:14px;" onerror="this.style.display='none'" />` : '';
+  const pennyNote = isPenny ? `<div class="penny-note">🪙 <div><strong>Penny item.</strong> Should scan at $0.01 at the register. Shelf tag may show higher — scan it or ask an associate first.</div></div>` : '';
+  document.getElementById('modalBody').innerHTML = `
+    ${imgHtml}${pennyNote}
+    <div class="modal-price-row">
+      <span class="modal-price-now ${isPenny?'gold':'red'}">$${parseFloat(price).toFixed(2)}</span>
+      ${hasOriginal?`<span class="modal-price-was">was $${parseFloat(wasPrice).toFixed(2)}</span>`:''}
+    </div>
+    ${saved?`<div class="modal-save">✓ You save $${saved}${pct?` (${pct}% off)`:''}</div>`:''}
+    <div class="modal-badges">
+      <span class="modal-badge ${isPenny?'pill-gold':'pill-red'}">${isPenny?'🪙 PENNY':pct?pct+'% OFF':'CLEARANCE'}</span>
+      <span class="modal-badge" style="background:var(--bg);color:var(--ink2);border:1.5px solid var(--border);">Home Depot</span>
+    </div>
+    <hr class="modal-divider">
+    <div class="modal-section-label">Store Location</div>
+    <div class="modal-store-block">
+      <div class="modal-store-sq" style="background:#E85D00">HD</div>
+      <div class="modal-store-info">
+        <div class="modal-store-name">${storeName||'Home Depot'}</div>
+        <div class="modal-store-addr">${storeAddress||'See store for details'}</div>
+        <div class="modal-store-dist">${distText}</div>
+      </div>
+    </div>
+    <div class="modal-detail-grid">
+      <div class="modal-detail-item"><div class="modal-detail-key">SKU</div><div class="modal-detail-val" style="font-family:monospace;font-size:12px;">${sku}</div></div>
+      ${hasOriginal?`<div class="modal-detail-item"><div class="modal-detail-key">Original Price</div><div class="modal-detail-val">$${parseFloat(wasPrice).toFixed(2)}</div></div>`:''}
+      <div class="modal-detail-item"><div class="modal-detail-key">Clearance Price</div><div class="modal-detail-val" style="color:${isPenny?'var(--gold)':'var(--red)'}">$${parseFloat(price).toFixed(2)}</div></div>
+      ${rating?`<div class="modal-detail-item"><div class="modal-detail-key">Rating</div><div class="modal-detail-val">⭐ ${parseFloat(rating).toFixed(1)}</div></div>`:''}
+      ${stockNum?`<div class="modal-detail-item"><div class="modal-detail-key">In Stock</div><div class="modal-detail-val">${stockNum} unit${stockNum>1?'s':''}</div></div>`:''}
+    </div>
+    <div class="modal-actions">
+      ${storeAddress?`<button class="modal-action-btn btn-primary" onclick="openMap('${storeAddress}')">📍 Get Directions</button>`:''}
+      ${url?`<button class="modal-action-btn btn-primary" onclick="window.open('${url}','_blank')">View on HomeDepot.com</button>`:''}
+      <button class="modal-action-btn btn-secondary" onclick="closeModalDirect()">← Back</button>
+    </div>`;
+  document.getElementById('modalBackdrop').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) { if(e.target===document.getElementById('modalBackdrop')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modalBackdrop').classList.remove('open'); document.body.style.overflow=''; }
+function openMap(addr) { window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addr+' Home Depot')}`,'_blank'); }
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeModalDirect(); });
+
+function sortDeals(mode) {
+  let sorted = [...allDeals];
+  if(mode==='discount') sorted.sort((a,b)=>((b.wasPrice-b.price)/b.wasPrice)-((a.wasPrice-a.price)/a.wasPrice));
+  if(mode==='price') sorted.sort((a,b)=>a.price-b.price);
+  if(mode==='penny') sorted.sort((a,b)=>{if(a.price<=0.01&&b.price>0.01)return -1;if(b.price<=0.01&&a.price>0.01)return 1;return a.price-b.price;});
+  renderDeals(sorted);
+}
+
+function toggleFilter(el, key) {
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('on','hd','penny'));
+  el.classList.add('on');
+  if(key==='hd') el.classList.add('hd');
+  if(key==='penny') el.classList.add('penny');
+  let filtered = [...allDeals];
+  if(key==='penny') filtered=filtered.filter(d=>d.price<=0.01);
+  if(key==='70') filtered=filtered.filter(d=>d.wasPrice&&(d.wasPrice-d.price)/d.wasPrice>=0.70);
+  if(key==='90') filtered=filtered.filter(d=>d.wasPrice&&(d.wasPrice-d.price)/d.wasPrice>=0.90);
+  renderDeals(filtered);
+}
+
+function addStep(text) {
+  const el = document.createElement('div');
+  el.className = 'loading-step';
+  el.innerHTML = `<div class="step-icon done">✓</div>${text}`;
+  document.getElementById('loadingSteps').appendChild(el);
+}
+
+function sleep(ms) { return new Promise(r=>setTimeout(r,ms)); }
 </script>
 </body>
 </html>
