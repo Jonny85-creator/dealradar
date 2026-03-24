@@ -9,34 +9,37 @@ app.use(express.static('public'));
 
 const APIFY_TOKEN = process.env.APIFY_TOKEN;
 
-// Start an Apify actor run
 app.post('/api/scan', async (req, res) => {
   const { zip } = req.body;
   if (!zip || zip.length !== 5) return res.status(400).json({ error: 'Invalid ZIP' });
 
   try {
     const response = await fetch(
-      `https://api.apify.com/v2/acts/bluebird~home-depot-scraper/runs?token=${APIFY_TOKEN}`,
+      `https://api.apify.com/v2/acts/jupri~homedepot/runs?token=${APIFY_TOKEN}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          search: 'clearance',
-          zipCode: zip,
-          maxItems: 40,
-          country: 'US'
+          query: ['clearance', 'special buy'],
+          limit: 40,
+          dev_proxy_config: {
+            useApifyProxy: true,
+            apifyProxyGroups: ['RESIDENTIAL'],
+            apifyProxyCountry: 'US'
+          }
         })
       }
     );
     const data = await response.json();
+    console.log('Apify start response:', JSON.stringify(data));
     if (!data.data) return res.status(500).json({ error: 'Failed to start scan', detail: data });
     res.json({ runId: data.data.id, datasetId: data.data.defaultDatasetId });
   } catch (err) {
+    console.error('Scan error:', err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Check run status
 app.get('/api/status/:runId', async (req, res) => {
   try {
     const response = await fetch(
@@ -49,7 +52,6 @@ app.get('/api/status/:runId', async (req, res) => {
   }
 });
 
-// Get results from dataset
 app.get('/api/results/:datasetId', async (req, res) => {
   try {
     const response = await fetch(
@@ -63,4 +65,4 @@ app.get('/api/results/:datasetId', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`DealRadar server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`DealRadar running on port ${PORT}`));
